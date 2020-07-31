@@ -1,49 +1,60 @@
 let playerOneFighters = [];
 let playerTwoFighters = [];
-let fighters = [];
 let fighterNumber = 0;
 const finalNumberOfFighters = 6;
 let playerNumber = 1;
 let playerOneFighter;
-let playerTwoFIghter;
+let playerTwoFighter;
 let playerTwoWeapon;
 let playerOneWeapon;
 
-let input = document.getElementById("fighter-name");
+let playAgainMenu = document.getElementById("play-again-menu");
+let fighterElement = document.getElementById('fighter-name');
+let fighterForm_p = document.querySelector("#fighter-form>p");
+let fighterForm = document.getElementById("fighter-form");
+let playGame_p = document.querySelector("#play-game>p");
 
-input.addEventListener("keyup", function(event) {
-    // Number 13 is the "Enter" key on the keyboard
-    if (event.keyCode === 13) {
-      // Trigger the button element with a click
-      document.getElementById("add-fighter-btn").click();
-    }
-  });
+
+wireUpButtons();
+
+function wireUpButtons(){
+    let addFighterButton = document.getElementById("fighter-name");
+    
+    addFighterButton.addEventListener("keyup", function(event) {
+        if (event.keyCode === 13) {
+            document.getElementById("add-fighter-btn").click();
+        }
+    });
+
+}
 
 function addFighter()
 {
-    let fighter = document.getElementById('fighter-name').value;
-    if(validateFighter(fighter)){
+    if(playerNumber === 1){
+        assignFighter(playerOneFighters);
+    } else {
+        assignFighter(playerTwoFighters);
+    }
+ }
+
+ function assignFighter(fighters){
+    let fighter = fighterElement.value;
+    if(validateFighter(fighter, fighters)){
         fighters.push(fighter.toUpperCase().trim());
-        document.getElementById('fighter-name').value = "";
+        fighterElement.value = "";
         fighterNumber++;
         let listItem = document.createElement("li");
-        listItem.textContent = '#' + fighterNumber + ': ' +  fighters[fighterNumber -1];
+        listItem.textContent = fighters[fighterNumber -1];
         listItem.setAttribute('id', fighter);    
         document.querySelector("#player-" + playerNumber + "-fighters").appendChild(listItem);
     } else {
         alert('Invalid fighter name!');  
     }
-   
     if(fighterNumber === finalNumberOfFighters && playerNumber === 2){
-        playerTwoFighters = fighters;
-        fighters = [];
-        document.getElementById("fighter-form").style.display = 'none';
-        document.querySelector("#fighter-form>p").innerHTML = 'Player 1, Please enter six fighters'
+        fighterForm.style.display = 'none';
         addPlayButton();    
     } else if(fighterNumber === finalNumberOfFighters && playerNumber === 1){
-        document.querySelector("#fighter-form>p").innerHTML = 'Player 2, Please enter six fighters'
-        playerOneFighters = fighters;
-        fighters = [];
+        fighterForm_p.innerHTML = 'Player 2, Please enter six fighters'
         fighterNumber = 0;
         playerNumber = 2;
     }
@@ -66,16 +77,17 @@ function addFighter()
     }
     playerOneFighter = getRandomPlayer(playerOneFighters);
     playerTwoFighter = getRandomPlayer(playerTwoFighters);
-    document.querySelector("#play-game>p").innerHTML = playerOneFighter + ' VS ' + playerTwoFighter;
+    playGame_p.innerHTML = playerOneFighter + ' VS ' + playerTwoFighter;
     showWeaponMenu();
 }
 
-
+let weaponMenu_p = document.querySelector("#select-weapon>p");
+let weaponMenu = document.querySelector("#select-weapon");
  function showWeaponMenu(){
     playerNumber = 1;
-     document.querySelector("#select-weapon>p").innerHTML ="Player #"
+     weaponMenu_p.innerHTML ="Player #"
       + playerNumber + " , Please select  " + playerOneFighter + "'s weapon.";
-    document.getElementById("select-weapon").style.display = 'block';  
+    weaponMenu.style.display = 'block';  
  }
 
  function assignFighterWeapon(){
@@ -133,37 +145,24 @@ function addFighter()
         }
     }
 
-    let result;
-    if(winner === 0){
-        result = 'Both fighters yielded a ' + playerTwoWeapon + ' and died!';
-        
-        playerOneFighters.splice(playerOneFighters.indexOf(playerOneFighter), 1);
-        playerTwoFighters.splice(playerTwoFighters.indexOf(playerTwoFighter), 1);
-    } else if (winner === 1){
-        result = playerOneFighter + ' defeats  ' + playerTwoFighter + 's ' + 
-        playerTwoWeapon + ' with a ' + playerOneWeapon + '!';
-        playerTwoFighters.splice(playerTwoFighters.indexOf(playerTwoFighter), 1);
-    } else {
-        result = playerTwoFighter + ' defeats  ' + playerOneFighter + 's ' + 
-        playerOneWeapon + ' with a ' + playerTwoWeapon + '!';
-        playerOneFighters.splice(playerOneFighters.indexOf(playerOneFighter), 1);
-    }
-
-    resetFighterDisplay();
-    document.querySelector("#play-game>p").innerHTML = result;
-    setTimeout(() => {document.querySelector("#play-game>p").innerHTML = ''; determineIfGameContinues();}, 3000);
+    let result = removeLosers(winner);
+    playGame_p.innerHTML = result;
+    document.getElementById("continue").style.display = "inline";
     }
 
 function determineIfGameContinues(){
+    document.getElementById("continue").style.display = "none";
+    playGame_p.innerHTML = '';
+
     if(playerTwoFighters.length === 0 && playerTwoFighters.length === 0){
-        document.querySelector("#play-game>p").innerHTML = 'You both have no remaining players. No one wins!';
+        playGame_p.innerHTML = 'You both have no remaining players. No one wins!';
         displayReplayOptions();
     }
     else if(playerOneFighters.length === 0){
-        document.querySelector("#play-game>p").innerHTML = 'Player 1 has ran out of fighers. Player 2 wins!';
+        playGame_p.innerHTML = 'Player 1 has ran out of fighers. Player 2 wins!';
         displayReplayOptions();
     } else if (playerTwoFighters.length === 0){
-        document.querySelector("#play-game>p").innerHTML = 'Player 2 has ran out of fighers. Player 1 wins!';
+        playGame_p.innerHTML = 'Player 2 has ran out of fighers. Player 1 wins!';
         displayReplayOptions();
     } else {
         getFighters();
@@ -171,18 +170,18 @@ function determineIfGameContinues(){
 }
 
 function displayReplayOptions(){
-    document.getElementById("play-again-menu").style.display = 'block';  
+    playAgainMenu.style.display = 'block';  
 }
 
 function continueOrNot(){
     let choice = document.querySelector('input[name="continue"]:checked').value;
-    document.getElementById("play-again-menu").style.display = 'none';
-    document.querySelector("#play-game>p").innerHTML = '';
+    playAgainMenu.style.display = 'none';
+    playGame_p.innerHTML = '';
 
     if(choice === 'yes'){
         resetGame();
     } else {
-        document.querySelector("#play-game>p").innerHTML = 'Goodbye!';
+        playGame_p.innerHTML = 'Goodbye!';
     }
 }
 
@@ -193,33 +192,37 @@ function resetGame(){
     playerTwoList.innerHTML = '';
     playerOneFighters = [];
     playerTwoFighters = [];
-    fighters = [];
+    fighterForm_p.innerHTML = 'Player 1, Please enter six fighters'
     fighterNumber = 0;
     playerNumber = 1;
     document.getElementById("fighter-form").style.display = 'block';
-
 }
 
-function resetFighterDisplay(){
+function removeLosers(winner){
 
-    let playerOneList = document.getElementById('player-1-fighters');
-    playerOneList.innerHTML = '';
-    let playerTwoList = document.getElementById('player-2-fighters');
-    playerTwoList.innerHTML = '';
-    let num = 1;
-    playerOneFighters.forEach(element => {
-        let listItem = document.createElement("li");
-        listItem.textContent = '#' + num + ': ' +  element;
-        document.querySelector("#player-1-fighters").appendChild(listItem); 
-        num++;
-    });
-    num = 1;
-    playerTwoFighters.forEach(element => {
-         let listItem = document.createElement("li");
-         listItem.textContent = '#' + num + ': ' +  element;
-         document.querySelector("#player-2-fighters").appendChild(listItem); 
-         num++;
-     });
+    let playerOneListItem = document.getElementById(playerOneFighter);
+    let playerTwoListItem = document.getElementById(playerTwoFighter);
+    let result;
+
+    if(winner === 0){
+        result = 'Both fighters yielded a ' + playerTwoWeapon + ' and died!';
+        playerOneFighters.splice(playerOneFighters.indexOf(playerOneFighter), 1);
+        playerTwoFighters.splice(playerTwoFighters.indexOf(playerTwoFighter), 1);
+        playerOneListItem.parentNode.removeChild(playerOneListItem);
+        playerTwoListItem.parentNode.removeChild(playerTwoListItem);
+    } else if (winner === 1){
+        result = playerOneFighter + ' defeats  ' + playerTwoFighter + 's ' + 
+        playerTwoWeapon + ' with a ' + playerOneWeapon + '!';
+        playerTwoFighters.splice(playerTwoFighters.indexOf(playerTwoFighter), 1);
+        playerTwoListItem.parentNode.removeChild(playerTwoListItem);
+    } else {
+        result = playerTwoFighter + ' defeats  ' + playerOneFighter + 's ' + 
+        playerOneWeapon + ' with a ' + playerTwoWeapon + '!';
+        playerOneFighters.splice(playerOneFighters.indexOf(playerOneFighter), 1);
+        playerOneListItem.parentNode.removeChild(playerOneListItem);
+    }
+
+    return result;
 }
 
  function getRandomPlayer(fighters){
@@ -232,7 +235,7 @@ function resetFighterDisplay(){
     button.parentNode.removeChild(button);
  }
 
- function validateFighter(fighter){
+ function validateFighter(fighter, fighters){
 
     fighter = fighter.replace(/^\s+/, '').replace(/\s+$/, '');
     let foundFighter = false;

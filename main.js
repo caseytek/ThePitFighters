@@ -2,7 +2,7 @@ let playerOneFighters = [];
 let playerTwoFighters = [];
 let playerNumber = 1;
 let fighterNumber = 0;
-const finalNumberOfFighters = 2;
+const finalNumberOfFighters = 6;
 let playerOneFighter;
 let playerTwoFighter;
 let playerTwoWeapon;

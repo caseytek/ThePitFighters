@@ -2,7 +2,7 @@ let playerOneFighters = [];
 let playerTwoFighters = [];
 let playerNumber = 1;
 let fighterNumber = 0;
-const finalNumberOfFighters = 6;
+const finalNumberOfFighters = 2;
 let playerOneFighter;
 let playerTwoFighter;
 let playerTwoWeapon;
@@ -51,8 +51,7 @@ function addFighter()
     showWeaponMenu();
 }
 
-let weaponMenu = document.querySelector("#select-weapon");
- function showWeaponMenu(){
+function showWeaponMenu(){
     playerNumber = 1;
      $('#select-weapon>p').html("Player #"
       + playerNumber + " , Please select  " + playerOneFighter + "'s weapon.");
@@ -60,8 +59,8 @@ let weaponMenu = document.querySelector("#select-weapon");
  }
 
  function assignFighterWeapon(){
-     try {
-        let weapon = $('input[name="weapon"]:checked');
+    let weapon = $('input[name="weapon"]:checked');
+    if(weapon.val()) {
         if(playerNumber == 1){
             playerOneWeapon = weapon.val();
             playerNumber = 2;
@@ -74,7 +73,7 @@ let weaponMenu = document.querySelector("#select-weapon");
             $(weapon).prop('checked', false);
             determineRoundOutcome();
         }
-    } catch (error) {
+    } else {
         alert('Please select a weapon.');
         }
  }
@@ -110,7 +109,7 @@ let weaponMenu = document.querySelector("#select-weapon");
     let result = removeLosers(winner);
     $('#play-game>p').html(result);
     $("#continue").show();
-    }
+}
 
 function determineIfGameContinues(){
     $("#continue").hide();
